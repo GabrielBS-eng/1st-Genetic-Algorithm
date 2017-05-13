@@ -1,4 +1,4 @@
-/*
+  /*
   FEDERAL UNIVERSITY OF UBERLANDIA
   Faculty of Computer Science
   Computational Inteligence
@@ -120,10 +120,10 @@ void crossover(int individ[][IND], int sons_generation[][IND])
   int father2[IND];
   for (int i=0; i<size_sons; i+=2)
   {
-    // roulette(individ, father1);
-    // roulette(individ, father2);
-    tour(individ, father1);
-    tour(individ, father2);
+    roulette(individ, father1);
+    roulette(individ, father2);
+    // tour(individ, father1);
+    // tour(individ, father2);
     // printInd(father1);
     // printInd(father2);
 
@@ -217,8 +217,8 @@ void roulette(int individ[][IND], int winner[])
     {
       if(i==0) chose = i;
       else chose = i-1;
+      break;
     }
-    break;
   }
   for(i=0; i<IND; i++)
   {
@@ -297,7 +297,6 @@ int main()
   int bestOfExecution[EXEC];
   int solutions = 0;
 
-
   unsigned int semente;
   FILE *fp;
   fp = fopen("/dev/urandom", "r");
@@ -315,7 +314,7 @@ int main()
 
   for(e=0; e<EXEC; e++)
   {
-    srand(e);
+    // srand(e);
     v_good = 0;
     good = &v_good;
     v_best = 100000;
