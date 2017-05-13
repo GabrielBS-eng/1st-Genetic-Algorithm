@@ -284,46 +284,6 @@ void bestBetweenFathersAndSons(int individ[][IND], int sons[][IND])
   }
 }
 
-/*//TODO: english comment
-void bestBetweenFathersAndSons(int individ[][IND], int sons[][IND])
-{
-  int size_sons = POP*PROBCROSS;
-  int totPop = POP + POP*PROBCROSS;
-  int fatherAndSons[totPop][IND];
-  int best, worst, bestInd, worstInd;
-  for (int i=0; i<POP; i++)
-  {
-    for (int j=0; j<IND; j++)
-    {
-      fatherAndSons[i][j] = individ[i][j];
-    }
-  }
-  for (int i=0; i<size_sons; i++)
-  {
-    for (int j=0; j<IND; j++)
-    {
-      fatherAndSons[i+POP][j] = sons[i][j];
-    }
-  }
-  for (int i=0; i<POP; i++)
-  {
-    for (int k=0; k<totPop; k++)
-    {
-      if(k==0)
-      {
-        best = k;
-        worst = k;
-      }
-      if(fatherAndSons[k][10] <= fatherAndSons[best][10]){
-        best = k;
-        fatherAndSons[best][10] = 100000;
-      }
-      if(k<POP) if(individ[k][10] >= individ[worst][10]) worst = k;
-    }
-    for (int j=0; j<IND; j++) individ[worst][j] = fatherAndSons[best][j];
-  }
-}*/
-
 int main()
 {
   int individ[POP][IND];
