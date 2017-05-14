@@ -22,14 +22,14 @@
 
 int recursiv1(int individ[][IND], int i, int j, int k);
 int recursiv2(int individ[][IND], int i, int k);
-void tour(int individ[][IND], int _chose[]);
+void tour(int individ[][IND], int _chose[], int *index = NULL);
 void mutationInd(int _mutant[]);
 void mutationPop(int _individ[][IND], int totPop);
 void general_avaliac(int somebody[]);
 void printInd(int somebody[]);
 void printPop(int individ[][IND], int totPop, int *good, int *best, int *worst);
 void crossover(int individ[][IND], int sons[][IND]);
-void roulette(int individ[][IND], int winner[]);
+void roulette(int individ[][IND], int winner[], int *index = NULL);
 void sort(int individ[][IND], int totPop);
 void elitism(int individ[][IND]);
 void bestBetweenFathersAndSons(int individ[][IND], int sons[][IND]);
@@ -99,7 +99,7 @@ void printPop(int individ[][IND], int totPop, int *good, int *best, int *worst)
 }
 
 //TODO: english comment
-void tour(int individ[][IND], int _chose[])
+void tour(int individ[][IND], int _chose[], int *index)
 {
   int round[TOUR][IND], best, x;
 
@@ -198,7 +198,7 @@ void mutationPop(int _individ[][IND], int totPop)
 }
 
 //TODO: english comment
-void roulette(int individ[][IND], int winner[])
+void roulette(int individ[][IND], int winner[], int *index)
 {
   int fit_reverse[POP];
   int acum_sum[POP];
