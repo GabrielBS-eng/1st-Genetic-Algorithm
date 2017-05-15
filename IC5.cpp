@@ -28,11 +28,11 @@ void mutationPop(int _individ[][IND], int totPop);
 void general_avaliac(int somebody[]);
 void printInd(int somebody[]);
 void printPop(int individ[][IND], int totPop, int *good, int *best, int *worst);
-void crossover(int individ[][IND], int sons[][IND]);
+void crossover(int individ[][IND], int sons[][IND], int indexFather[] = NULL);
 void roulette(int individ[][IND], int winner[], int *index = NULL);
 void sort(int individ[][IND], int totPop);
-void elitism(int individ[][IND]);
-void bestBetweenFathersAndSons(int individ[][IND], int sons[][IND]);
+void elitism(int individ[][IND], int sons[][IND], int indexFather[]);
+void bestBetweenFathersAndSons(int individ[][IND], int sons[][IND], int index[]);
 
 //TODO: english comment
 int recursiv1(int individ[][IND], int i,int j,int k)
@@ -111,20 +111,22 @@ void tour(int individ[][IND], int _chose[], int *index)
     if(round[i][10] < round[best][10]) best = i;
   }
   for(int k=0; k<IND; k++) _chose[k] = round[best][k];
+  if(index != NULL) *index = best;
 }
 
-void crossover(int individ[][IND], int sons_generation[][IND])
+void crossover(int individ[][IND], int sons_generation[][IND], int indexFather[])
 {
   int k, aux, confirm;
   int size_sons = POP*PROBCROSS;
   int father1[IND];
   int father2[IND];
+
   for (int i=0; i<size_sons; i+=2)
   {
-    roulette(individ, father1);
-    roulette(individ, father2);
-    // tour(individ, father1);
-    // tour(individ, father2);
+    if (indexFather !=NULL) roulette(individ, father1, &indexFather[i]); else roulette(individ, father1);
+    if (indexFather !=NULL) roulette(individ, father2, &indexFather[i+1]); else roulette(individ, father2);
+    // if (indexFather !=NULL) tour(individ, father1, &indexFather[i]); else tour(individ, father1);
+    // if (indexFather !=NULL) tour(individ, father2, &indexFather[i+1]); else tour(individ, father2);
     // printInd(father1);
     // printInd(father2);
 
@@ -186,9 +188,11 @@ void mutationPop(int _individ[][IND], int totPop)
   {
     if(j = rand()%totPop <= qnt)
     {
-      int pos1 = rand()%(IND-3);
-      int pos2 = rand()%(IND-3);
-      int aux;
+      pos1 = rand()%(IND-1);
+      do
+      {
+        pos2 = rand()%(IND-1);
+      }while(pos2 == pos1);
       aux = _individ[i][pos1];
       _individ[i][pos1] = _individ[i][pos2];
       _individ[i][pos2] = aux;
@@ -221,6 +225,7 @@ void roulette(int individ[][IND], int winner[], int *index)
       break;
     }
   }
+  if(index != NULL) *index = chose;
   for(i=0; i<IND; i++)
   {
     winner[i] = individ[chose][i];
@@ -255,57 +260,38 @@ void sort(int individ[][IND], int totPop)
 }
 
 // TODO: english comment
-void elitism(int individ[][IND])
+void elitism(int individ[][IND], int sons[][IND], int indexFather[])
 {
-  int k, aux, confirm;
   int size_sons = POP*PROBCROSS;
-  int father1[IND];
-  int father2[IND];
-  for (int i=0; i<size_sons; i+=2)
+  int totPop = POP + POP*PROBCROSS;
+  int surviving_parents = POP*PROBCROSS*0.25;
+  int i, j, best, worst, bestInd, worstInd;
+  int parents[int(size_sons)][IND];
+
+  for (i=0; i<size_sons; i++)
   {
-    roulette(individ, father1);
-    roulette(individ, father2);
-    // tour(individ, father1);
-    // tour(individ, father2);
-    // printInd(father1);
-    // printInd(father2);
-
-    k = rand()%(IND-1);
-    do
+    for (j=0; j<IND; j++)
     {
-      confirm = 1;
-      aux = father1[k];
-      father1[k] = father2[k];
-      father2[k] = aux;
-      for(int j=0; j<IND-1; j++)
-      {
-        if(k!=j)
-        {
-          if(father1[k] == father1[j])
-          {
-            k = j;
-            confirm = 0;
-            break;
-          }
-        }
-      }
-    }while(!confirm);
-    // printInd(father1);
-    // printInd(father2);
-    general_avaliac(father1);
-    general_avaliac(father2);
-    // printInd(father1);
-    // printInd(father2);
-    // getchar(); //             these prints and the getchar are used to check if fathers avaliation has been changed
+      parents[i][j] = individ[indexFather[i]][j];
+    }
+  }
 
-    // for (int p = 0; p<IND; p++)
-    // {
-    //   sons_generation[i][p] = father1[p];
-    //   sons_generation[i+1][p] = father2[p];
-    // }
+  sort(parents, size_sons);
 
-    // printInd(sons_generation[i]);
-    // printInd(sons_generation[i+1]);
+  for (i=0; i<surviving_parents; i++)
+  {
+    for (j=0; j<IND; j++)
+    {
+      individ[i][j] = parents[i][j];
+    }
+  }
+
+  for (i=0; i<POP; i++)
+  {
+    for (j=0; j<IND; j++)
+    {
+      individ[i+surviving_parents][j] = sons[i][j];
+    }
   }
 }
 
@@ -352,6 +338,7 @@ int main()
   int *worst = &v_worst;
   int bestOfExecution[EXEC];
   int solutions = 0;
+  int indexFather[pop_sons];
 
   unsigned int semente;
   FILE *fp;
@@ -388,11 +375,13 @@ int main()
             individ[i][j] = rand()%10;
           }while(recursiv1(individ, i,j,j) != 1);
         }
-      }while(recursiv2(individ, i,j-2) != 1);
+      }while(/*recursiv2(individ, i,j-2) != 1*/1!=1);
     }
     for(int k=0; k<GEN; k++)
     {
       printPop(individ, POP, good, best, worst);
+      // printf("best: %d\n", v_best);
+      // getchar();
       // printf("\nBons indivíduos: %d\n\n",*good);
       // printf("Melhor: %d\n",*best);
       // printf("Pior: %d\n",*worst);
@@ -402,6 +391,8 @@ int main()
       mutationPop(sons, pop_sons);
       // printPop(sons, pop_sons);
       // getchar();
+
+      // elitism(individ, sons, indexFather);
       bestBetweenFathersAndSons(individ, sons);
       // printInd(individ[3]);
       // printInd(individ[3]);
